@@ -1,0 +1,48 @@
+{
+  "sharded": true,
+  "vindexes": {
+    "binary": {
+      "type": "binary"
+    },
+    "binary_md5": {
+      "type": "binary_md5"
+    },
+    "customer_order_keyspace_idx": {
+      "type": "consistent_lookup_unique",
+      "params": {
+        "table": "unsharded.customer_order_keyspace_idx",
+        "from": "id",
+        "to": "keyspace_id"
+      },
+      "owner": "customer_order"
+    }
+  },
+  "tables": {
+    "customer": {
+      "column_vindexes": [{
+        "column": "id",
+        "name": "binary_md5"
+      }]
+    },
+    "customer_order": {
+      "column_vindexes": [{
+        "column": "customer_id",
+        "name": "binary_md5"
+      },
+      {
+        "column": "id",
+        "name": "customer_order_keyspace_idx"
+      }]
+    },
+    "customer_order_item": {
+      "column_vindexes": [{
+        "column": "customer_order_id",
+        "name": "customer_order_keyspace_idx"
+      },
+      {
+        "column": "keyspace_id",
+        "name": "binary"
+      }]
+    }
+  }
+}

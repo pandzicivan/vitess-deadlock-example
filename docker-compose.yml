@@ -1,0 +1,19 @@
+version: '3.9'
+services:
+  poc-db:
+    image: vitess/vttestserver:v18.0.1-mysql80
+    container_name: poc-db
+    command:
+      - "/vt/bin/vttestserver"
+      - "--alsologtostderr"
+      - "--port=33574"
+      - "--mysql_bind_host=0.0.0.0"
+      - "--vschema_ddl_authorized_users=%"
+      - "--foreign_key_mode=disallow"
+      - "--keyspaces=unsharded,sharded"
+      - "--num_shards=1,2"
+      - "--schema_dir=/schema"
+    ports:
+      - 33577:33577
+    volumes:
+      - ./vitess:/schema

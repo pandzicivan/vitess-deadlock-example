@@ -1,0 +1,6 @@
+{
+  "sharded": false,
+  "tables": {
+    "customer_order_keyspace_idx": {}
+  }
+}

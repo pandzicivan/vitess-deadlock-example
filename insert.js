@@ -13,14 +13,6 @@ const mysql = require("mysql2/promise");
     try {
         console.log(`starting insert of customer with ID 1`);
         await connection.beginTransaction();
-        await connection.execute(`
-        INSERT INTO customer(
-            id,
-            name
-        ) VALUES (
-            1,
-            'John Doe'
-        )`);
 
         await connection.execute(`
         INSERT INTO customer_order(

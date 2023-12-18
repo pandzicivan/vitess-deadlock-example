@@ -18,12 +18,6 @@
     }
   },
   "tables": {
-    "customer": {
-      "column_vindexes": [{
-        "column": "id",
-        "name": "hash"
-      }]
-    },
     "customer_order": {
       "column_vindexes": [{
         "column": "customer_id",

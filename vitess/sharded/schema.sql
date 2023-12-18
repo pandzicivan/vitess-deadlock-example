@@ -1,9 +1,3 @@
-CREATE TABLE customer(
-  id INT NOT NULL,
-  name VARCHAR(25),
-  PRIMARY KEY(id)
-);
-
 CREATE TABLE customer_order(
   id INT NOT NULL,
   customer_id INT NOT NULL,

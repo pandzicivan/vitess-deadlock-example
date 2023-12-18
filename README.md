@@ -114,17 +114,9 @@ node insert.js
 
 This command consists of 2 parts:
 
-1. 3 inserts in tables inside transaction: `customer, customer_order and customer_order_item`. 
+1. 2 inserts in tables inside transaction: `customer_order and customer_order_item`. 
 
 ```
-INSERT INTO customer(
-    id,
-    name
-) VALUES (
-    1,
-    "John Doe"
-);
-
 INSERT INTO customer_order(
     id,
     customer_id,
@@ -143,10 +135,10 @@ INSERT INTO customer_order_item(
     1,
     1,
     "Foo"
-);,
+);
 ```
 
-All 3 inserts will be successful.
+Both inserts will be successful.
 
 2. 1 insert in `customer_order_item` table and 1 update of `customer_order` inside transaction.
 

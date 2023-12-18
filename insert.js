@@ -52,12 +52,12 @@ const mysql = require("mysql2/promise");
             item_name
         ) VALUES (
             UNHEX(:id),
-            UNHEX(:customerId),
+            UNHEX(:customerOrderId),
             :name
         )`,
         {
             id: UlidMonotonic.generate().toRaw(),
-            customerId: customerOrderId.toRaw(),
+            customerOrderId: customerOrderId.toRaw(),
             name: 'Item Name'
         });
         await connection.commit();

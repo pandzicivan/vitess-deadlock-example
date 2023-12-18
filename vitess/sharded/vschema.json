@@ -4,8 +4,8 @@
     "binary": {
       "type": "binary"
     },
-    "binary_md5": {
-      "type": "binary_md5"
+    "hash": {
+      "type": "hash"
     },
     "customer_order_keyspace_idx": {
       "type": "consistent_lookup_unique",
@@ -21,13 +21,13 @@
     "customer": {
       "column_vindexes": [{
         "column": "id",
-        "name": "binary_md5"
+        "name": "hash"
       }]
     },
     "customer_order": {
       "column_vindexes": [{
         "column": "customer_id",
-        "name": "binary_md5"
+        "name": "hash"
       },
       {
         "column": "id",

@@ -15,41 +15,41 @@ There are 3 tables in sharded keyspace with ULIDs as primary keys for each of th
 
 ```
 CREATE TABLE customer(
-  id BINARY(16),
+  id INT NOT NULL,
   name VARCHAR(25),
   PRIMARY KEY(id)
 );
 
 CREATE TABLE customer_order(
-  id BINARY(16),
-  customer_id BINARY(16) NOT NULL,
+  id INT NOT NULL,
+  customer_id INT NOT NULL,
   ordinal VARCHAR(25),
   PRIMARY KEY(id)
 );
 
 CREATE TABLE customer_order_item(
-  id BINARY(16),
-  customer_order_id BINARY(16) NOT NULL,
+  id INT NOT NULL,
+  customer_order_id INT NOT NULL,
   item_name VARCHAR(25) NOT NULL,
-  keyspace_id VARBINARY(16),
+  keyspace_id VARBINARY(10),
   PRIMARY KEY(id)
-)
+);
 ```
 
 #### Sharding explained
 
 ##### customer
 
-`customer` table is sharded with `binary_md5` algorithm.
+`customer` table is sharded with `hash` algorithm.
 
 ##### customer_order
 
-`customer_order` table is sharded by using `customer_id` and `binary_md5`. Table is also owner of `customer_order_keyspace_idx` 
-vindex which populates `customer_order.id` consistent_lookup_unique vindex.
+`customer_order` table is sharded by using `customer_id` and `hash`. Table is also owner of `customer_order_keyspace_idx`
+consistent_lookup_unique vindex.
 
 ##### customer_order_item
 
-`customer_order_item` table is sharded with `customer_order_id` consistent_lookup_unique vindex.
+`customer_order_item` table is using `customer_order_id` consistent_lookup_unique as primary vindex.
 
 ```
 {
@@ -58,8 +58,8 @@ vindex which populates `customer_order.id` consistent_lookup_unique vindex.
     "binary": {
       "type": "binary"
     },
-    "binary_md5": {
-      "type": "binary_md5"
+    "hash": {
+      "type": "hash"
     },
     "customer_order_keyspace_idx": {
       "type": "consistent_lookup_unique",
@@ -75,13 +75,13 @@ vindex which populates `customer_order.id` consistent_lookup_unique vindex.
     "customer": {
       "column_vindexes": [{
         "column": "id",
-        "name": "binary_md5"
+        "name": "hash"
       }]
     },
     "customer_order": {
       "column_vindexes": [{
         "column": "customer_id",
-        "name": "binary_md5"
+        "name": "hash"
       },
       {
         "column": "id",
@@ -121,7 +121,7 @@ INSERT INTO customer(
     id,
     name
 ) VALUES (
-    UNHEX(018C7C8E271176804EEB306F491193BA),
+    1,
     "John Doe"
 );
 
@@ -130,8 +130,8 @@ INSERT INTO customer_order(
     customer_id,
     ordinal
 ) VALUES (
-    UNHEX(018C7C8CF4DC7DFE519629275FE45B07),
-    UNHEX(018C7C8E271176804EEB306F491193BA),
+    1,
+    1,
     1
 )`;
 
@@ -140,8 +140,8 @@ INSERT INTO customer_order_item(
     customer_order_id,
     item_name
 ) VALUES (
-    UNHEX(018C7C8E271F6E900E91062D26BB9A67),
-    UNHEX(018C7C8CF4DC7DFE519629275FE45B07),
+    1,
+    1,
     "Foo"
 );,
 ```
@@ -156,14 +156,14 @@ INSERT INTO customer_order_item(
     customer_order_id,
     item_name
 ) VALUES (
-    UNHEX(018C7C8E27231B0B0F8866D465121877),
-    UNHEX(018C7C8CF4DC7DFE519629275FE45B07),
+    2,
+    1,
     "Bar"
 );
 
 UPDATE customer_order
 SET ordinal = 2
-WHERE id = UNHEX(018C7C8CF4DC7DFE519629275FE45B07)
+WHERE id = 1
 ```
           
 For some reason update halts with error `DeadlineExceeded desc = Lock wait timeout exceeded;` and problematic query highlighted as:
@@ -181,8 +181,6 @@ code: 'ER_LOCK_WAIT_TIMEOUT',
   sqlMessage: 'lookup.Map: Code: DEADLINE_EXCEEDED\n' +
     'vttablet: rpc error: code = DeadlineExceeded desc = Lock wait timeout exceeded; try restarting transaction
      (errno 1205) (sqlstate HY000) (CallerID: userData1): Sql: "select id, keyspace_id from customer_order_keyspace_idx 
-     where id in ::id for update", BindVars: {#maxLimit: "type:INT64 value:\\"10001\\""id: "type:TUPLE values:{type:VARBINARY 
-     value:\\"\\\\x01\\\\x8c|\\\\x9bZ\\\\xa7<\\\\xa7\\\\x07\\\\xd3\\\\x1e]\\\\x81~\\\\x05&\\"}"}\n' +
-    '\n' +
+     where id in ::id for update",  BindVars: {#maxLimit: "type:INT64 value:\\"10001\\""id: "type:TUPLE values:{type:INT64 value:\\"1\\"}"}\n' +
     'target: unsharded.0.primary'
 ```

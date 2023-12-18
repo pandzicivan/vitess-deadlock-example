@@ -30,7 +30,7 @@ const mysql = require("mysql2/promise");
         ) VALUES (
             1,
             1,
-            2
+            1
         )`);
 
         await connection.execute(`
@@ -53,7 +53,7 @@ const mysql = require("mysql2/promise");
 
     // Just insert another order and update name of customer
     try {
-        console.log(`staring insert of new order and customer name update with ID 1`);
+        console.log(`starting insert of new order and customer name update with ID 1`);
         await connection.beginTransaction();
         await connection.execute(`
         INSERT INTO customer_order_item(
@@ -74,6 +74,7 @@ const mysql = require("mysql2/promise");
         await connection.commit();
         console.log(`succesfully finished insert/update 1`)
     } catch (e) {
+        console.log('rollback stuff')
         connection.rollback();
         console.log(e);
         process.exit(-1);

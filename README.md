@@ -125,7 +125,7 @@ INSERT INTO customer_order(
     1,
     1,
     1
-)`;
+);
 
 INSERT INTO customer_order_item(
     id,
@@ -143,6 +143,8 @@ Both inserts will be successful.
 2. 1 insert in `customer_order_item` table and 1 update of `customer_order` inside transaction.
 
 ```
+START TRANSACTION;
+
 INSERT INTO customer_order_item(
     id,
     customer_order_id,
@@ -155,7 +157,7 @@ INSERT INTO customer_order_item(
 
 UPDATE customer_order
 SET ordinal = 2
-WHERE id = 1
+WHERE id = 1;
 ```
           
 For some reason update halts with error `DeadlineExceeded desc = Lock wait timeout exceeded;` and problematic query highlighted as:
